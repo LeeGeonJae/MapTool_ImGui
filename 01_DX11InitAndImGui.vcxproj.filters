@@ -31,12 +31,15 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="Main\MapTool">
+      <UniqueIdentifier>{19783801-ce7a-4f1c-95f9-bef896579d67}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine">
+      <UniqueIdentifier>{1557eeee-804a-4f04-a5cf-6881a492c726}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
-      <Filter>Main\Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Example.cpp">
       <Filter>Main\Source Files</Filter>
     </ClCompile>
     <ClCompile Include="imgui\imgui.cpp">
@@ -66,11 +69,14 @@
     <ClCompile Include="Texture.cpp">
       <Filter>Main\Resource Files</Filter>
     </ClCompile>
+    <ClCompile Include="MapToolProcess.cpp">
+      <Filter>Main\MapTool</Filter>
+    </ClCompile>
+    <ClCompile Include="Example.cpp">
+      <Filter>Engine</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Example.h">
-      <Filter>Main\Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="imgui\imconfig.h">
       <Filter>ImGui\Header</Filter>
     </ClInclude>
@@ -112,6 +118,12 @@
     </ClInclude>
     <ClInclude Include="Texture.h">
       <Filter>Main\Resource Files</Filter>
+    </ClInclude>
+    <ClInclude Include="MapToolProcess.h">
+      <Filter>Main\MapTool</Filter>
+    </ClInclude>
+    <ClInclude Include="Example.h">
+      <Filter>Engine</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

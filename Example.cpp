@@ -115,28 +115,28 @@ void Example::Initialize(HWND window)
 	InitShaders(); // 사용자 정의 함수 (셰이더 초기화 등의 작업)
 }
 
-void Example::Update(Texture* _texture)
+void Example::Update(Mesh* _mesh)
 {
-	// 색상 저장을 위한 픽셀 데이터 배열 생성 및 초기화
-	std::vector<Vec4> pixels(CANVAS_WIDTH * CANVAS_HEIGHT, Vec4{ 0.8f, 0.8f, 0.8f, 1.0f });
+	//// 색상 저장을 위한 픽셀 데이터 배열 생성 및 초기화
+	//std::vector<Vec4> pixels(CANVAS_WIDTH * CANVAS_HEIGHT, Vec4{ 0.8f, 0.8f, 0.8f, 1.0f });
 
-	// 특정 픽셀 위치에 색상 값 할당 (예: (0, 0) 위치는 빨간색, (1, 0) 위치는 노란색, (2, 0) 위치는 흰색)
-	pixels[0 + CANVAS_WIDTH * 0] = Vec4{ 1.0f, 0.0f, 0.0f, 1.0f };
-	pixels[1 + CANVAS_WIDTH * 0] = Vec4{ 1.0f, 1.0f, 0.0f, 1.0f };
-	pixels[2 + CANVAS_WIDTH * 0] = Vec4{ 1.0f, 1.0f, 1.0f, 1.0f };
+	//// 특정 픽셀 위치에 색상 값 할당 (예: (0, 0) 위치는 빨간색, (1, 0) 위치는 노란색, (2, 0) 위치는 흰색)
+	//pixels[0 + CANVAS_WIDTH * 0] = Vec4{ 1.0f, 0.0f, 0.0f, 1.0f };
+	//pixels[1 + CANVAS_WIDTH * 0] = Vec4{ 1.0f, 1.0f, 0.0f, 1.0f };
+	//pixels[2 + CANVAS_WIDTH * 0] = Vec4{ 1.0f, 1.0f, 1.0f, 1.0f };
 
 	// 텍스처 버퍼 업데이트를 위해 텍스처 매핑
 	D3D11_MAPPED_SUBRESOURCE ms;
-	deviceContext->Map(_texture->GetTexture(), NULL, D3D11_MAP_WRITE_DISCARD, NULL, &ms);
+	deviceContext->Map(_mesh->GetTexture()->GetTexture(), NULL, D3D11_MAP_WRITE_DISCARD, NULL, &ms);
 
 	// CPU 데이터를 GPU로 복사하여 텍스처에 새로운 색상 데이터를 기록함
-	memcpy(ms.pData, pixels.data(), pixels.size() * sizeof(Vec4));
+	//memcpy(ms.pData, pixels.data(), pixels.size() * sizeof(Vec4));
 
 	// 텍스처 매핑 해제 (업데이트 완료)
-	deviceContext->Unmap(_texture->GetTexture(), NULL);
+	deviceContext->Unmap(_mesh->GetTexture()->GetTexture(), NULL);
 }
 
-void Example::Render(Texture* _texture, Mesh* _mesh)
+void Example::RenderBegin()
 {
 	float clearColor[4] = { 0.0f, 0.0f, 0.0f, 1.0f };
 	deviceContext->RSSetViewports(1, &viewport);
@@ -147,6 +147,11 @@ void Example::Render(Texture* _texture, Mesh* _mesh)
 	deviceContext->VSSetShader(vertexShader, 0, 0);
 	deviceContext->PSSetShader(pixelShader, 0, 0);
 
+
+}
+
+void Example::MeshRender(Mesh* _mesh)
+{
 	// select which vertex buffer to display
 	UINT stride = sizeof(Vertex);
 	UINT offset = 0;
@@ -155,7 +160,7 @@ void Example::Render(Texture* _texture, Mesh* _mesh)
 
 	// https://github.com/Microsoft/DirectXTK/wiki/Getting-Started
 	// https://github.com/microsoft/Xbox-ATG-Samples/tree/main/PCSamples/IntroGraphics/SimpleTexturePC
-	deviceContext->PSSetSamplers(0, 1, _texture->GetSamplerState());//TODO: samplers to array
+	deviceContext->PSSetSamplers(0, 1, _mesh->GetTexture()->GetSamplerState());//TODO: samplers to array
 	deviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
 	// for ()
@@ -163,7 +168,7 @@ void Example::Render(Texture* _texture, Mesh* _mesh)
 		// rect 정보를 돌면서
 		// vectex 버퍼 업데이트하고
 		deviceContext->IASetVertexBuffers(0, 1, _mesh->GetVertexBuffer(), &stride, &offset);
-		deviceContext->PSSetShaderResources(0, 1, _texture->GetShaderResourceView());
+		deviceContext->PSSetShaderResources(0, 1, _mesh->GetTexture()->GetShaderResourceView());
 		// drawIndexed();
 	}
 

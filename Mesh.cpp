@@ -24,12 +24,20 @@ void Mesh::CreateVertexBuffer(ID3D11Device* _device)
 {
 	// Create a vertex buffer
 	{
+		const float Width = 120.f;
+		const float Height = 120.f;
+
+		float left = (m_XNumber * Width / WIDTH) - 1.0f;
+		float right = ((m_XNumber + 1) * Width / WIDTH) - 1.0f;
+		float top = 1.0f - (m_YNumber * Height / HEIGHT);
+		float bottom = 1.0f - ((m_YNumber + 1) * Height / HEIGHT);
+
 		vertices =
 		{
-			{ { -1.0f,  1.0f, 0.0f, 1.0f }, { 0.f, 0.f },},
-			{ {  0.5f,  1.0f, 0.0f, 1.0f }, { 1.f, 0.f },},
-			{ { -1.0f, -1.0f, 0.0f, 1.0f }, { 0.f, 1.f },},
-			{ {  0.5f, -1.0f, 0.0f, 1.0f }, { 1.f, 1.f },},
+			{ { left,  top, 0.0f, 1.0f }, { 0.f, 0.f },},
+			{ { right,  top, 0.0f, 1.0f }, { 1.f, 0.f },},
+			{ { left, bottom, 0.0f, 1.0f }, { 0.f, 1.f },},
+			{ { right, bottom, 0.0f, 1.0f }, { 1.f, 1.f },},
 		};
 
 		D3D11_BUFFER_DESC bufferDesc;

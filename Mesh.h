@@ -21,6 +21,9 @@ public:
 	UINT GetIndexCount() { return m_indexCount; }
 	Texture* GetTexture() { return m_texture; }
 
+	void SetXYPosition(int _x, int _y) { m_XNumber = _x; m_YNumber = _y; }
+	void AddXYPosition(int _x, int _y) { m_XNumber += _x; m_YNumber += _y; }
+
 private:
 	void CreateVertexBuffer(ID3D11Device* _device);
 	void CreateIndexBuffer(ID3D11Device* _device);
@@ -34,4 +37,7 @@ private:
 
 	vector<uint16_t> indices = {};
 	vector<Vertex> vertices = {};
+
+	int m_XNumber;
+	int m_YNumber;
 };

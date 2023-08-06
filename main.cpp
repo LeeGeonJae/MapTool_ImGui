@@ -1,32 +1,45 @@
-#include <imgui.h>
-#include <imgui_impl_dx11.h>
-#include <imgui_impl_win32.h>
-#include <windows.h>
-#include <memory>
-#include <iostream>
-
 #include "Example.h"
 #include "Mesh.h"
 #include "Texture.h"
+#include "MapToolProcess.h"
 
+HWND g_hwnd;
+
+void Init();
 LRESULT WINAPI WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
 // 콘솔창이 있으면 디버깅에 유리합니다.
 int main()
 {
+	// 윈도우 세팅
+	Init();
+
+	// 맵툴 프로세스
+	MapToolProcess process;
+	process.Initialize(g_hwnd);
+	process.Loop();
+
+	//UnregisterClass(wc.lpszClassName, wc.hInstance);
+
+	return 0;
+}
+
+
+void Init()
+{
 	WNDCLASSEX wc = {
-		sizeof(WNDCLASSEX),
-		CS_CLASSDC,
-		WndProc,
-		0L,
-		0L,
-		GetModuleHandle(NULL),
-		NULL,
-		NULL,
-		NULL,
-		NULL,
-		L"HongLabGraphics", // lpszClassName, L-string
-		NULL
+	sizeof(WNDCLASSEX),
+	CS_CLASSDC,
+	WndProc,
+	0L,
+	0L,
+	GetModuleHandle(NULL),
+	NULL,
+	NULL,
+	NULL,
+	NULL,
+	L"HongLabGraphics", // lpszClassName, L-string
+	NULL
 	};
 
 	RegisterClassEx(&wc);
@@ -48,83 +61,10 @@ int main()
 		wc.hInstance,
 		NULL);
 
-	ShowWindow(hwnd, SW_SHOWDEFAULT);
-	UpdateWindow(hwnd);
+	g_hwnd = hwnd;
 
-	// 엔진 생성 및 세팅
-	auto example = std::make_unique<Example>(hwnd);
-
-	// 텍스쳐 생성 및 세팅
-	Texture* texture = new Texture;
-	texture->Initialize(example->device, L"Golem.png");
-
-	// 메시 생성 및 세팅
-	Mesh* mesh = new Mesh;
-	mesh->Initialize(example->device);
-	mesh->SetTexture(texture);
-
-	// ImGui 생성
-	IMGUI_CHECKVERSION();
-	ImGui::CreateContext();
-	ImGuiIO& io = ImGui::GetIO(); (void)io;
-	io.DisplaySize = ImVec2(WIDTH, HEIGHT);
-	ImGui::StyleColorsLight();
-
-	// Setup Platform/Renderer backends
-	ImGui_ImplDX11_Init(example->device, example->deviceContext);
-	ImGui_ImplWin32_Init(hwnd);
-
-
-	float canvasColor[4] = { 0.0f, 0.0f, 0.0f, 1.0f };//TODO: 실습문제용 임시코드
-
-	// Main message loop
-	MSG msg = {};
-	while (WM_QUIT != msg.message)
-	{
-		if (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE))
-		{
-			TranslateMessage(&msg);
-			DispatchMessage(&msg);
-		}
-		else
-		{
-			// Start the Dear ImGui frame
-			ImGui_ImplDX11_NewFrame();//TODO: IMGUI 사용
-			ImGui_ImplWin32_NewFrame();
-			ImGui::NewFrame();
-			ImGui::Begin("Background Color");
-
-			// ImGui 렌더러
-			if (ImGui::Button("Button"))
-				std::cout << "안녕하세요" << std::endl;
-			//ImGui::SliderFloat3("RGB(0.0->1.0)", canvasColor, 0.0f, 1.0f);
-
-			ImGui::End();
-			ImGui::Render();
-
-			example->Update(texture);
-			example->Render(texture, mesh);
-
-			ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());//TODO: IMGUI 사용
-
-			// switch the back buffer and the front buffer
-			example->swapChain->Present(1, 0);
-		}
-	}
-
-	// Cleanup
-	ImGui_ImplDX11_Shutdown();
-	ImGui_ImplWin32_Shutdown();
-	ImGui::DestroyContext();
-
-	example->Clean();
-	DestroyWindow(hwnd);
-	UnregisterClass(wc.lpszClassName, wc.hInstance);
-
-	delete mesh;
-	delete texture;
-
-	return 0;
+	ShowWindow(g_hwnd, SW_SHOWDEFAULT);
+	UpdateWindow(g_hwnd);
 }
 
 // Forward declare message handler from imgui_impl_win32.cpp

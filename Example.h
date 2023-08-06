@@ -17,8 +17,9 @@ public:
 	void InitShaders();
 	void Initialize(HWND window);
 
-	void Update(Texture* _texture);
-	void Render(Texture* _texture, Mesh* _mesh);
+	void Update(Mesh* _mesh);
+	void RenderBegin();
+	void MeshRender(Mesh* _mesh);
 	void Clean();
 
 public:

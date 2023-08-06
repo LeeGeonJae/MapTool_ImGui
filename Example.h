@@ -1,20 +1,24 @@
 #pragma once
+
 #include "defalut.h"
+
+class Mesh;
+class Texture;
 
 class Example
 {
 public:
-	Example(HWND window, int width, int height, int canvasWidth, int canvasHeight)
+	Example(HWND window)
 	{
-		Initialize(window, width, height, canvasWidth, canvasHeight);
+		Initialize(window);
 	}
 
 	// https://docs.microsoft.com/en-us/windows/win32/direct3d11/how-to--compile-a-shader
 	void InitShaders();
-	void Initialize(HWND window, int width, int height, int canvasWidth, int canvasHeight);
+	void Initialize(HWND window);
 
-	void Update();
-	void Render();
+	void Update(Texture* _texture);
+	void Render(Texture* _texture, Mesh* _mesh);
 	void Clean();
 
 public:
@@ -27,16 +31,7 @@ public:
 	ID3D11RenderTargetView* renderTargetView;
 	ID3D11VertexShader* vertexShader;
 	ID3D11PixelShader* pixelShader;
-	ID3D11InputLayout* layout;
+	ID3D11InputLayout* layout;	
 
-	ID3D11Buffer* vertexBuffer = nullptr;
-	ID3D11Buffer* indexBuffer = nullptr;
-	ID3D11Texture2D* canvasTexture = nullptr;
-	ID3D11ShaderResourceView* canvasTextureView = nullptr;
-	ID3D11RenderTargetView* canvasRenderTargetView = nullptr;
-	ID3D11SamplerState* colorSampler;
-	UINT indexCount;	
-
-	int canvasWidth, canvasHeight;
 	float backgroundColor[4] = { 0.8f, 0.8f, 0.8f, 1.0f };
 };

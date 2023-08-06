@@ -19,6 +19,11 @@
 
 using namespace std;
 
+const int WIDTH = 1500;
+const int HEIGHT = 900;
+const int CANVAS_WIDTH = WIDTH / 80;
+const int CANVAS_HEIGHT = HEIGHT / 80;
+
 // 수학의 4차원 벡터(vector)를 의미합니다. 
 // std::vector와는 다릅니다.
 struct Vec4

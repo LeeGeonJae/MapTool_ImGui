@@ -1,62 +1,73 @@
 #include "Example.h"
+#include "Texture.h"
+#include "Mesh.h"
 
 void Example::InitShaders()
 {
+	// 정점 쉐이더 컴파일
 	ID3DBlob* vertexBlob = nullptr;
 	ID3DBlob* pixelBlob = nullptr;
 	ID3DBlob* errorBlob = nullptr;
 
+	// "VS.hlsl" 파일을 컴파일하여 정점 쉐이더를 생성 (vs_5_0 프로파일 사용)
 	if (FAILED(D3DCompileFromFile(L"VS.hlsl", 0, 0, "main", "vs_5_0", 0, 0, &vertexBlob, &errorBlob)))
 	{
+		// 컴파일 오류가 발생한 경우 오류 메시지 출력
 		if (errorBlob) {
 			std::cout << "Vertex shader compile error\n" << (char*)errorBlob->GetBufferPointer() << std::endl;
 		}
 	}
 
+	// "PS.hlsl" 파일을 컴파일하여 픽셀 쉐이더를 생성 (ps_5_0 프로파일 사용)
 	if (FAILED(D3DCompileFromFile(L"PS.hlsl", 0, 0, "main", "ps_5_0", 0, 0, &pixelBlob, &errorBlob)))
 	{
+		// 컴파일 오류가 발생한 경우 오류 메시지 출력
 		if (errorBlob) {
 			std::cout << "Pixel shader compile error\n" << (char*)errorBlob->GetBufferPointer() << std::endl;
 		}
 	}
 
+	// 컴파일된 정점 쉐이더와 픽셀 쉐이더로부터 DirectX 11에서 사용 가능한 정점 쉐이더와 픽셀 쉐이더를 생성
 	device->CreateVertexShader(vertexBlob->GetBufferPointer(), vertexBlob->GetBufferSize(), NULL, &vertexShader);
 	device->CreatePixelShader(pixelBlob->GetBufferPointer(), pixelBlob->GetBufferSize(), NULL, &pixelShader);
 
-	// Create the input layout object
+	// 입력 레이아웃 생성
+	// 정점 쉐이더 입력 레이아웃을 정의하는 D3D11_INPUT_ELEMENT_DESC 배열을 생성
 	D3D11_INPUT_ELEMENT_DESC ied[] =
 	{
 		{"POSITION", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0},
 		{"TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 16, D3D11_INPUT_PER_VERTEX_DATA, 0},
 	};
 
+	// 입력 레이아웃 생성 및 정점 쉐이더와 연결
 	device->CreateInputLayout(ied, 2, vertexBlob->GetBufferPointer(), vertexBlob->GetBufferSize(), &layout);
+
+	// 입력 레이아웃을 사용하도록 설정
 	deviceContext->IASetInputLayout(layout);
 }
 
-void Example::Initialize(HWND window, int width, int height, int canvasWidth, int canvasHeight)
+void Example::Initialize(HWND window)
 {
-	this->canvasWidth = canvasWidth;
-	this->canvasHeight = canvasHeight;
-
+	// DXGI_SWAP_CHAIN_DESC 구조체 생성 및 초기화
 	DXGI_SWAP_CHAIN_DESC swapChainDesc;
 	ZeroMemory(&swapChainDesc, sizeof(swapChainDesc));
-	swapChainDesc.BufferDesc.Width = width;								// set the back buffer width
-	swapChainDesc.BufferDesc.Height = height;							// set the back buffer height
-	swapChainDesc.BufferDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;    // use 32-bit color
-	swapChainDesc.BufferCount = 2;                                   // one back buffer
-	swapChainDesc.BufferDesc.RefreshRate.Numerator = 60;
-	swapChainDesc.BufferDesc.RefreshRate.Denominator = 1;
-	swapChainDesc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;     // how swap chain is to be used
-	swapChainDesc.OutputWindow = window;                               // the window to be used
-	swapChainDesc.SampleDesc.Count = 1;                              // how many multisamples
-	swapChainDesc.Windowed = TRUE;                                   // windowed/full-screen mode
-	swapChainDesc.Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH;    // allow full-screen switching
-	swapChainDesc.SwapEffect = DXGI_SWAP_EFFECT_DISCARD;
+	swapChainDesc.BufferDesc.Width = WIDTH;                          // 백 버퍼의 가로 크기 설정
+	swapChainDesc.BufferDesc.Height = HEIGHT;                        // 백 버퍼의 세로 크기 설정
+	swapChainDesc.BufferDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;   // 32비트 색상 형식 사용
+	swapChainDesc.BufferCount = 2;                                  // 백 버퍼 개수 설정 (더블 버퍼링)
+	swapChainDesc.BufferDesc.RefreshRate.Numerator = 60;           // 주사율 분자 (60 FPS)
+	swapChainDesc.BufferDesc.RefreshRate.Denominator = 1;          // 주사율 분모 (60 FPS)
+	swapChainDesc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;    // 스왑 체인의 사용 방식 설정 (렌더 타겟으로 사용)
+	swapChainDesc.OutputWindow = window;                            // 렌더링 대상 윈도우 핸들 설정
+	swapChainDesc.SampleDesc.Count = 1;                             // 멀티 샘플링 설정 (비활성화)
+	swapChainDesc.Windowed = TRUE;                                 // 윈도우 모드로 설정
+	swapChainDesc.Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH;   // 전체 화면 전환 허용
+	swapChainDesc.SwapEffect = DXGI_SWAP_EFFECT_DISCARD;           // 스왑 체인 효과 설정 (DISCARD 방식)
 
 	UINT createDeviceFlags = 0;
 	//createDeviceFlags |= D3D11_CREATE_DEVICE_DEBUG;
 
+	// 특정 기능 수준에서 D3D 장치와 스왑 체인 생성
 	const D3D_FEATURE_LEVEL featureLevelArray[1] = { D3D_FEATURE_LEVEL_11_0 };
 	if (FAILED(D3D11CreateDeviceAndSwapChain(NULL,
 		D3D_DRIVER_TYPE_HARDWARE,
@@ -74,11 +85,12 @@ void Example::Initialize(HWND window, int width, int height, int canvasWidth, in
 		std::cout << "D3D11CreateDeviceAndSwapChain() error" << std::endl;
 	}
 
-	// CreateRenderTarget
+	// 렌더 타겟 생성
 	ID3D11Texture2D* pBackBuffer;
 	swapChain->GetBuffer(0, IID_PPV_ARGS(&pBackBuffer));
 	if (pBackBuffer)
 	{
+		// 백 버퍼 텍스처를 이용하여 렌더 타겟 뷰 생성
 		device->CreateRenderTargetView(pBackBuffer, NULL, &renderTargetView);
 		pBackBuffer->Release();
 	}
@@ -88,146 +100,43 @@ void Example::Initialize(HWND window, int width, int height, int canvasWidth, in
 		exit(-1);
 	}
 
-	// Set the viewport
+	// 뷰포트 설정
+	// 화면 뷰포트를 생성하고 초기화
 	ZeroMemory(&viewport, sizeof(D3D11_VIEWPORT));
 	viewport.TopLeftX = 0;
 	viewport.TopLeftY = 0;
-	viewport.Width = float(width);
-	viewport.Height = float(height);
-	viewport.MinDepth = 0.0f;
-	viewport.MaxDepth = 1.0f;//Note: important for depth buffering
+	viewport.Width = float(WIDTH);   // 뷰포트의 가로 크기 설정
+	viewport.Height = float(HEIGHT); // 뷰포트의 세로 크기 설정
+	viewport.MinDepth = 0.0f;        // 뷰포트의 최소 깊이 값 설정
+	viewport.MaxDepth = 1.0f;        // 뷰포트의 최대 깊이 값 설정 (중요: 깊이 버퍼링에 중요한 값)
 	deviceContext->RSSetViewports(1, &viewport);
 
-	InitShaders();
-
-	// Create texture and rendertarget
-	D3D11_SAMPLER_DESC sampDesc;
-	ZeroMemory(&sampDesc, sizeof(sampDesc));
-	sampDesc.Filter = D3D11_FILTER_MIN_MAG_MIP_POINT; // D3D11_FILTER_MIN_MAG_MIP_LINEAR
-	sampDesc.AddressU = D3D11_TEXTURE_ADDRESS_CLAMP;
-	sampDesc.AddressV = D3D11_TEXTURE_ADDRESS_CLAMP;
-	sampDesc.AddressW = D3D11_TEXTURE_ADDRESS_CLAMP;
-	sampDesc.ComparisonFunc = D3D11_COMPARISON_NEVER;
-	sampDesc.MinLOD = 0;
-	sampDesc.MaxLOD = D3D11_FLOAT32_MAX;
-
-	//Create the Sample State
-	device->CreateSamplerState(&sampDesc, &colorSampler);
-
-	D3D11_TEXTURE2D_DESC textureDesc;
-	ZeroMemory(&textureDesc, sizeof(textureDesc));
-	textureDesc.MipLevels = textureDesc.ArraySize = 1;
-	textureDesc.Format = DXGI_FORMAT_R32G32B32A32_FLOAT;
-	textureDesc.SampleDesc.Count = 1;
-	textureDesc.Usage = D3D11_USAGE_DYNAMIC;
-	textureDesc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
-	textureDesc.MiscFlags = 0;
-	textureDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
-	textureDesc.Width = canvasWidth;
-	textureDesc.Height = canvasHeight;
-
-	device->CreateTexture2D(&textureDesc, nullptr, &canvasTexture);
-
-	if (canvasTexture)
-	{
-		device->CreateShaderResourceView(canvasTexture, nullptr, &canvasTextureView);
-
-		D3D11_RENDER_TARGET_VIEW_DESC renderTargetViewDesc;
-		renderTargetViewDesc.Format = textureDesc.Format;
-		renderTargetViewDesc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2D;
-		renderTargetViewDesc.Texture2D.MipSlice = 0;
-
-		device->CreateRenderTargetView(canvasTexture, &renderTargetViewDesc, &canvasRenderTargetView);
-	}
-	else
-	{
-		std::cout << "CreateRenderTargetView() error" << std::endl;
-	}
-
-	// Create a vertex buffer
-	{
-		const std::vector<Vertex> vertices =
-		{
-			{ { -1.0f,  1.0f, 0.0f, 1.0f }, { 0.f, 0.f },},
-			{ {  0.5f,  1.0f, 0.0f, 1.0f }, { 1.f, 0.f },},
-			{ { -1.0f, -1.0f, 0.0f, 1.0f }, { 0.f, 1.f },},
-			{ {  0.5f, -1.0f, 0.0f, 1.0f }, { 1.f, 1.f },},
-		};
-
-		D3D11_BUFFER_DESC bufferDesc;
-		ZeroMemory(&bufferDesc, sizeof(bufferDesc));
-		bufferDesc.Usage = D3D11_USAGE_DYNAMIC;                // write access access by CPU and GPU
-		bufferDesc.ByteWidth = UINT(sizeof(Vertex) * vertices.size());             // size is the VERTEX struct * 3
-		bufferDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;       // use as a vertex buffer
-		bufferDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;    // allow CPU to write in buffer
-		bufferDesc.StructureByteStride = sizeof(Vertex);
-
-		D3D11_SUBRESOURCE_DATA vertexBufferData = { 0, };
-		vertexBufferData.pSysMem = vertices.data();
-		vertexBufferData.SysMemPitch = 0;
-		vertexBufferData.SysMemSlicePitch = 0;
-
-		const HRESULT hr = device->CreateBuffer(&bufferDesc, &vertexBufferData, &vertexBuffer);
-		if (FAILED(hr)) {
-			std::cout << "CreateBuffer() failed. " << std::hex << hr << std::endl;
-		};
-	}
-
-	// Create an index buffer
-	{
-		const std::vector<uint16_t> indices =
-		{
-			 0, 1 ,2,
-			 2, 1, 3
-		};
-
-		indexCount = UINT(indices.size());
-
-		D3D11_BUFFER_DESC bufferDesc = {};
-		bufferDesc.Usage = D3D11_USAGE_DYNAMIC;                // write access access by CPU and GPU
-		bufferDesc.ByteWidth = UINT(sizeof(uint16_t) * indices.size());
-		bufferDesc.BindFlags = D3D11_BIND_INDEX_BUFFER;       // use as a vertex buffer
-		bufferDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;    // allow CPU to write in buffer
-		bufferDesc.StructureByteStride = sizeof(uint16_t);
-
-		D3D11_SUBRESOURCE_DATA indexBufferData = { 0 };
-		indexBufferData.pSysMem = indices.data();
-		indexBufferData.SysMemPitch = 0;
-		indexBufferData.SysMemSlicePitch = 0;
-
-		device->CreateBuffer(&bufferDesc, &indexBufferData, &indexBuffer);
-	}
-
-	// Create Textrue File
-	{
-		DirectX::TexMetadata md;
-		DirectX::ScratchImage img;
-		HRESULT hr = DirectX::LoadFromWICFile(L"Golem.png", DirectX::WIC_FLAGS_NONE, &md, img);
-		assert(SUCCEEDED(hr));
-
-		hr = DirectX::CreateShaderResourceView(device, img.GetImages(), img.GetImageCount(), md, &canvasTextureView);
-		assert(SUCCEEDED(hr));
-	}
+	// 셰이더 초기화
+	InitShaders(); // 사용자 정의 함수 (셰이더 초기화 등의 작업)
 }
 
-void Example::Update()
+void Example::Update(Texture* _texture)
 {
-	// 색상 저장
-	std::vector<Vec4> pixels(canvasWidth * canvasHeight, Vec4{ 0.8f, 0.8f, 0.8f, 1.0f });
-	pixels[0 + canvasWidth * 0] = Vec4{ 1.0f, 0.0f, 0.0f, 1.0f };
-	pixels[1 + canvasWidth * 0] = Vec4{ 1.0f, 1.0f, 0.0f, 1.0f };
-	pixels[2 + canvasWidth * 0] = Vec4{ 1.0f, 1.0f, 1.0f, 1.0f };
+	// 색상 저장을 위한 픽셀 데이터 배열 생성 및 초기화
+	std::vector<Vec4> pixels(CANVAS_WIDTH * CANVAS_HEIGHT, Vec4{ 0.8f, 0.8f, 0.8f, 1.0f });
 
-	// Update texture buffer
+	// 특정 픽셀 위치에 색상 값 할당 (예: (0, 0) 위치는 빨간색, (1, 0) 위치는 노란색, (2, 0) 위치는 흰색)
+	pixels[0 + CANVAS_WIDTH * 0] = Vec4{ 1.0f, 0.0f, 0.0f, 1.0f };
+	pixels[1 + CANVAS_WIDTH * 0] = Vec4{ 1.0f, 1.0f, 0.0f, 1.0f };
+	pixels[2 + CANVAS_WIDTH * 0] = Vec4{ 1.0f, 1.0f, 1.0f, 1.0f };
+
+	// 텍스처 버퍼 업데이트를 위해 텍스처 매핑
 	D3D11_MAPPED_SUBRESOURCE ms;
-	deviceContext->Map(canvasTexture, NULL, D3D11_MAP_WRITE_DISCARD, NULL, &ms);
+	deviceContext->Map(_texture->GetTexture(), NULL, D3D11_MAP_WRITE_DISCARD, NULL, &ms);
 
-	// CPU 데이터를 GPU로 복사
+	// CPU 데이터를 GPU로 복사하여 텍스처에 새로운 색상 데이터를 기록함
 	memcpy(ms.pData, pixels.data(), pixels.size() * sizeof(Vec4));
-	deviceContext->Unmap(canvasTexture, NULL);
+
+	// 텍스처 매핑 해제 (업데이트 완료)
+	deviceContext->Unmap(_texture->GetTexture(), NULL);
 }
 
-void Example::Render()
+void Example::Render(Texture* _texture, Mesh* _mesh)
 {
 	float clearColor[4] = { 0.0f, 0.0f, 0.0f, 1.0f };
 	deviceContext->RSSetViewports(1, &viewport);
@@ -241,24 +150,24 @@ void Example::Render()
 	// select which vertex buffer to display
 	UINT stride = sizeof(Vertex);
 	UINT offset = 0;
-	deviceContext->IASetVertexBuffers(0, 1, &vertexBuffer, &stride, &offset);
-	deviceContext->IASetIndexBuffer(indexBuffer, DXGI_FORMAT_R16_UINT, 0);
+	deviceContext->IASetVertexBuffers(0, 1, _mesh->GetVertexBuffer(), &stride, &offset);
+	deviceContext->IASetIndexBuffer(_mesh->GetIndexBuffer(), DXGI_FORMAT_R16_UINT, 0);
 
 	// https://github.com/Microsoft/DirectXTK/wiki/Getting-Started
 	// https://github.com/microsoft/Xbox-ATG-Samples/tree/main/PCSamples/IntroGraphics/SimpleTexturePC
-	deviceContext->PSSetSamplers(0, 1, &colorSampler);//TODO: samplers to array
+	deviceContext->PSSetSamplers(0, 1, _texture->GetSamplerState());//TODO: samplers to array
 	deviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
 	// for ()
 	{
 		// rect 정보를 돌면서
 		// vectex 버퍼 업데이트하고
-		deviceContext->IASetVertexBuffers(0, 1, &vertexBuffer, &stride, &offset);
-		deviceContext->PSSetShaderResources(0, 1, &canvasTextureView);
+		deviceContext->IASetVertexBuffers(0, 1, _mesh->GetVertexBuffer(), &stride, &offset);
+		deviceContext->PSSetShaderResources(0, 1, _texture->GetShaderResourceView());
 		// drawIndexed();
 	}
 
-	deviceContext->DrawIndexed(indexCount, 0, 0);
+	deviceContext->DrawIndexed(_mesh->GetIndexCount(), 0, 0);
 }
 
 void Example::Clean()
@@ -266,12 +175,6 @@ void Example::Clean()
 	if (layout) { layout->Release(); layout = NULL; }
 	if (vertexShader) { vertexShader->Release(); vertexShader = NULL; }
 	if (pixelShader) { pixelShader->Release(); pixelShader = NULL; }
-	if (vertexBuffer) { vertexBuffer->Release(); vertexBuffer = NULL; }
-	if (indexBuffer) { indexBuffer->Release(); indexBuffer = NULL; }
-	if (canvasTexture) { canvasTexture->Release(); canvasTexture = NULL; }
-	if (canvasTextureView) { canvasTextureView->Release(); canvasTextureView = NULL; }
-	if (canvasRenderTargetView) { canvasRenderTargetView->Release(); canvasRenderTargetView = NULL; }
-	if (colorSampler) { colorSampler->Release(); colorSampler = NULL; }
 	if (renderTargetView) { renderTargetView->Release(); renderTargetView = NULL; }
 	if (swapChain) { swapChain->Release(); swapChain = NULL; }
 	if (deviceContext) { deviceContext->Release(); deviceContext = NULL; }

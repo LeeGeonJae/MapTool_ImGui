@@ -6,15 +6,14 @@
 #include <iostream>
 
 #include "Example.h"
+#include "Mesh.h"
+#include "Texture.h"
 
 LRESULT WINAPI WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
 // 콘솔창이 있으면 디버깅에 유리합니다.
 int main()
 {
-	const int width = 1500, height = 900;
-	const int canvasWidth = width / 80, canvasHeight = height / 80;
-
 	WNDCLASSEX wc = {
 		sizeof(WNDCLASSEX),
 		CS_CLASSDC,
@@ -33,7 +32,7 @@ int main()
 	RegisterClassEx(&wc);
 
 	// 실제로 그려지는 해상도를 설정하기 위해
-	RECT wr = { 0, 0, width, height };    // set the size, but not the position
+	RECT wr = { 0, 0, WIDTH, HEIGHT };    // set the size, but not the position
 	AdjustWindowRect(&wr, WS_OVERLAPPEDWINDOW, FALSE);    // adjust the size
 
 	HWND hwnd = CreateWindow(
@@ -52,18 +51,29 @@ int main()
 	ShowWindow(hwnd, SW_SHOWDEFAULT);
 	UpdateWindow(hwnd);
 
-	auto example = std::make_unique<Example>(hwnd, width, height, canvasWidth, canvasHeight);
-	//Example* example = new Example(....);
+	// 엔진 생성 및 세팅
+	auto example = std::make_unique<Example>(hwnd);
 
+	// 텍스쳐 생성 및 세팅
+	Texture* texture = new Texture;
+	texture->Initialize(example->device, L"Golem.png");
+
+	// 메시 생성 및 세팅
+	Mesh* mesh = new Mesh;
+	mesh->Initialize(example->device);
+	mesh->SetTexture(texture);
+
+	// ImGui 생성
 	IMGUI_CHECKVERSION();
 	ImGui::CreateContext();
 	ImGuiIO& io = ImGui::GetIO(); (void)io;
-	io.DisplaySize = ImVec2(width, height);
+	io.DisplaySize = ImVec2(WIDTH, HEIGHT);
 	ImGui::StyleColorsLight();
 
 	// Setup Platform/Renderer backends
 	ImGui_ImplDX11_Init(example->device, example->deviceContext);
 	ImGui_ImplWin32_Init(hwnd);
+
 
 	float canvasColor[4] = { 0.0f, 0.0f, 0.0f, 1.0f };//TODO: 실습문제용 임시코드
 
@@ -92,8 +102,8 @@ int main()
 			ImGui::End();
 			ImGui::Render();
 
-			example->Update();
-			example->Render();
+			example->Update(texture);
+			example->Render(texture, mesh);
 
 			ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());//TODO: IMGUI 사용
 
@@ -110,6 +120,9 @@ int main()
 	example->Clean();
 	DestroyWindow(hwnd);
 	UnregisterClass(wc.lpszClassName, wc.hInstance);
+
+	delete mesh;
+	delete texture;
 
 	return 0;
 }

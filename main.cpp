@@ -12,7 +12,7 @@ LRESULT WINAPI WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 // 콘솔창이 있으면 디버깅에 유리합니다.
 int main()
 {
-	const int width = 2300, height = 1200;
+	const int width = 1500, height = 900;
 	const int canvasWidth = width / 80, canvasHeight = height / 80;
 
 	WNDCLASSEX wc = {
@@ -87,7 +87,7 @@ int main()
 			// ImGui 렌더러
 			if (ImGui::Button("Button"))
 				std::cout << "안녕하세요" << std::endl;
-			ImGui::SliderFloat3("RGB(0.0->1.0)", canvasColor, 0.0f, 1.0f);
+			//ImGui::SliderFloat3("RGB(0.0->1.0)", canvasColor, 0.0f, 1.0f);
 
 			ImGui::End();
 			ImGui::Render();

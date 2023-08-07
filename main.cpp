@@ -3,8 +3,6 @@
 #include "Texture.h"
 #include "MapToolProcess.h"
 
-HWND g_hwnd;
-
 void Init();
 LRESULT WINAPI WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
@@ -14,9 +12,10 @@ int main()
 	// 윈도우 세팅
 	Init();
 
+
 	// 맵툴 프로세스
 	MapToolProcess process;
-	process.Initialize(g_hwnd);
+	process.Initialize(Data::g_hwnd);
 	process.Loop();
 
 	//UnregisterClass(wc.lpszClassName, wc.hInstance);
@@ -61,10 +60,11 @@ void Init()
 		wc.hInstance,
 		NULL);
 
-	g_hwnd = hwnd;
+	Data::g_hwnd = hwnd;
+	Data::g_hdc = GetDC(Data::g_hwnd);
 
-	ShowWindow(g_hwnd, SW_SHOWDEFAULT);
-	UpdateWindow(g_hwnd);
+	ShowWindow(Data::g_hwnd, SW_SHOWDEFAULT);
+	UpdateWindow(Data::g_hwnd);
 }
 
 // Forward declare message handler from imgui_impl_win32.cpp
@@ -85,17 +85,9 @@ LRESULT WINAPI WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 		if ((wParam & 0xfff0) == SC_KEYMENU) // Disable ALT application menu 
 			return 0;
 		break;
-	case WM_MOUSEMOVE:
-		//std::cout << "Mouse " << LOWORD(lParam) << " " << HIWORD(lParam) << std::endl;
-		break;
 	case WM_LBUTTONUP:
-		//std::cout << "WM_LBUTTONUP Left mouse button" << std::endl;
-		break;
-	case WM_RBUTTONUP:
-		//std::cout << "WM_RBUTTONUP Right mouse button" << std::endl;
-		break;
-	case WM_KEYDOWN:
-		//std::cout << "WM_KEYDOWN " << (int)wParam << std::endl;
+		std::cout << (float)Data::MousePos.x << std::endl;
+		std::cout << (float)Data::MousePos.y << std::endl;
 		break;
 	case WM_DESTROY:
 		::PostQuitMessage(0);

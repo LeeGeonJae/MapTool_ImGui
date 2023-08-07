@@ -7,6 +7,7 @@
 #include <d3dcompiler.h>
 #include <vector>
 #include <filesystem>
+#include <map>
 
 #include <imgui.h>
 #include <imgui_impl_dx11.h>
@@ -21,6 +22,8 @@
 #pragma comment(lib, "DirectXTex.lib")
 #endif
 
+#include "Data.h"
+
 using namespace std;
 
 const int WIDTH = 1500;
@@ -32,17 +35,30 @@ const int CANVAS_HEIGHT = HEIGHT / 80;
 // std::vector와는 다릅니다.
 struct Vec4
 {
-	float v[4];
+	float r;
+	float g;
+	float b;
+	float a;
+};
+
+struct RECT_F
+{
+	float left;
+	float right;
+	float top;
+	float bottom;
 };
 
 struct Vec2
 {
-	float v[2];
+	float x;
+	float y;
 };
 
 struct Vertex
 {
 	Vec4 pos;
+	Vec4 color;
 	Vec2 uv;
 };
 

@@ -1,5 +1,7 @@
 #pragma once
 #include "defalut.h"
+#include "ResourceManager.h"
+#include "KeyManager.h"
 
 class Mesh;
 class Texture;
@@ -20,9 +22,10 @@ public:
 
 public:
 	vector<Mesh*>	m_Mesh;
-	Texture*	m_Texture;
+	vector<Mesh*>	m_SelectedMesh;
 	Example*	m_Example;
 
 	HWND m_hwnd;
+	ResourceManager* m_ResourceManager = new ResourceManager;
+	KeyManager* m_KeyManager = new KeyManager;
 };
-

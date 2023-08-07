@@ -36,11 +36,12 @@ void Example::InitShaders()
 	D3D11_INPUT_ELEMENT_DESC ied[] =
 	{
 		{"POSITION", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0},
-		{"TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 16, D3D11_INPUT_PER_VERTEX_DATA, 0},
+		{"COLOR", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 16, D3D11_INPUT_PER_VERTEX_DATA, 0}, 
+		{"TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 32, D3D11_INPUT_PER_VERTEX_DATA, 0},
 	};
 
 	// 입력 레이아웃 생성 및 정점 쉐이더와 연결
-	device->CreateInputLayout(ied, 2, vertexBlob->GetBufferPointer(), vertexBlob->GetBufferSize(), &layout);
+	device->CreateInputLayout(ied, 3, vertexBlob->GetBufferPointer(), vertexBlob->GetBufferSize(), &layout);
 
 	// 입력 레이아웃을 사용하도록 설정
 	deviceContext->IASetInputLayout(layout);

@@ -22,6 +22,8 @@ public:
 	void MeshRender(Mesh* _mesh);
 	void Clean();
 
+	inline ID3D11DeviceContext* GetDeviceContext() const;
+
 public:
 	// 이름 짓기 규칙
 	// https://github.com/Microsoft/DirectXTK/wiki/Implementation#naming-conventions
@@ -32,7 +34,12 @@ public:
 	ID3D11RenderTargetView* renderTargetView;
 	ID3D11VertexShader* vertexShader;
 	ID3D11PixelShader* pixelShader;
-	ID3D11InputLayout* layout;	
+	ID3D11InputLayout* layout;
 
 	float backgroundColor[4] = { 0.8f, 0.8f, 0.8f, 1.0f };
 };
+
+ID3D11DeviceContext* Example::GetDeviceContext() const
+{
+	return deviceContext;
+}

@@ -59,20 +59,35 @@ void Mesh::CreateVertexBuffer(ID3D11Device* _device)
 		m_MeshRect.top = m_YNumber * Height / 2;
 		m_MeshRect.bottom = (m_YNumber + 1) * Height / 2;
 
-		vertices =
+		if (mbIsSelected)
 		{
-			{ { left,  top, 0.0f, 1.0f }, { 1.f, 1.f, 1.f, 1.f},{0.f, 0.f}},
-			{ { right,  top, 0.0f, 1.0f }, { 1.f, 1.f, 1.f, 1.f },{ 1.f, 0.f }},
-			{ { left, bottom, 0.0f, 1.0f }, { 1.f, 1.f, 1.f, 1.f },{ 0.f, 1.f }},
-			{ { right, bottom, 0.0f, 1.0f }, { 1.f, 1.f, 1.f, 1.f },{ 1.f, 1.f }},
-		};
+			vertices =
+			{
+				{ { left,  top, 0.0f, 1.0f }, { 1.f, 1.f, 1.f, 1.f},{0.f, 0.f}},
+				{ { right,  top, 0.0f, 1.0f }, { 1.f, 1.f, 1.f, 1.f },{ 1.f, 0.f }},
+				{ { left, bottom, 0.0f, 1.0f }, { 1.f, 1.f, 1.f, 1.f },{ 0.f, 1.f }},
+				{ { right, bottom, 0.0f, 1.0f }, { 1.f, 1.f, 1.f, 1.f },{ 1.f, 1.f }},
+			};
+		}
+		else
+		{
+			vertices =
+			{
+				{ { left,  top, 0.0f, 1.0f }, { 1.f, 1.f, 1.f, 0.5f},{0.f, 0.f}},
+				{ { right,  top, 0.0f, 1.0f }, { 1.f, 1.f, 1.f, 0.5f },{ 1.f, 0.f }},
+				{ { left, bottom, 0.0f, 1.0f }, { 1.f, 1.f, 1.f, 0.5f },{ 0.f, 1.f }},
+				{ { right, bottom, 0.0f, 1.0f }, { 1.f, 1.f, 1.f, 0.5f },{ 1.f, 1.f }},
+			};
+		}
+
+		
 
 		D3D11_BUFFER_DESC bufferDesc;
 		ZeroMemory(&bufferDesc, sizeof(bufferDesc));
-		bufferDesc.Usage = D3D11_USAGE_DYNAMIC;                // write access access by CPU and GPU
+		bufferDesc.Usage = D3D11_USAGE_DEFAULT;                // write access access by CPU and GPU
 		bufferDesc.ByteWidth = UINT(sizeof(Vertex) * 4);             // size is the VERTEX struct * 3
 		bufferDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;       // use as a vertex buffer
-		bufferDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;    // allow CPU to write in buffer
+		//bufferDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;    // allow CPU to write in buffer
 		bufferDesc.StructureByteStride = sizeof(Vertex);
 
 		D3D11_SUBRESOURCE_DATA vertexBufferData = { 0, };

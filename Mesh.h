@@ -56,7 +56,7 @@ void Mesh::SetIsSelected(bool bIsSelected, ID3D11DeviceContext* deviceContext)
 
 	for (Vertex& vertex : vertices)
 	{
-		vertex.color.a = mbIsSelected ? 0.5f : 1.f;
+		vertex.color.a = mbIsSelected ? 1.f : 0.5f;
 	}
 	deviceContext->UpdateSubresource(m_vertexBuffer, 0, nullptr, vertices.data(), 0, 0);
 }

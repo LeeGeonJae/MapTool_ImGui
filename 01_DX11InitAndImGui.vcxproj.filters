@@ -42,7 +42,7 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="main.cpp">
+    <ClCompile Include="main\main.cpp">
       <Filter>Main\Source Files</Filter>
     </ClCompile>
     <ClCompile Include="imgui\imgui.cpp">
@@ -66,25 +66,25 @@
     <ClCompile Include="imgui\imgui_widgets.cpp">
       <Filter>ImGui\Source</Filter>
     </ClCompile>
-    <ClCompile Include="Mesh.cpp">
+    <ClCompile Include="main\Mesh.cpp">
       <Filter>Main\Resource Files</Filter>
     </ClCompile>
-    <ClCompile Include="Texture.cpp">
+    <ClCompile Include="main\Texture.cpp">
       <Filter>Main\Resource Files</Filter>
     </ClCompile>
-    <ClCompile Include="MapToolProcess.cpp">
+    <ClCompile Include="main\MapToolProcess.cpp">
       <Filter>Main\MapTool</Filter>
     </ClCompile>
-    <ClCompile Include="Example.cpp">
+    <ClCompile Include="main\Example.cpp">
       <Filter>Engine</Filter>
     </ClCompile>
-    <ClCompile Include="ResourceManager.cpp">
+    <ClCompile Include="main\ResourceManager.cpp">
       <Filter>Main\Manager</Filter>
     </ClCompile>
-    <ClCompile Include="Data.cpp">
+    <ClCompile Include="main\Data.cpp">
       <Filter>Main\Header Files</Filter>
     </ClCompile>
-    <ClCompile Include="KeyManager.cpp">
+    <ClCompile Include="main\KeyManager.cpp">
       <Filter>Main\Manager</Filter>
     </ClCompile>
   </ItemGroup>
@@ -119,31 +119,31 @@
     <ClInclude Include="Library\Include\DirectXTex\DirectXTex.h">
       <Filter>Library</Filter>
     </ClInclude>
-    <ClInclude Include="stb_image.h">
+    <ClInclude Include="main\stb_image.h">
       <Filter>Library</Filter>
     </ClInclude>
-    <ClInclude Include="defalut.h">
+    <ClInclude Include="main\defalut.h">
       <Filter>Main\Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Mesh.h">
+    <ClInclude Include="main\Mesh.h">
       <Filter>Main\Resource Files</Filter>
     </ClInclude>
-    <ClInclude Include="Texture.h">
+    <ClInclude Include="main\Texture.h">
       <Filter>Main\Resource Files</Filter>
     </ClInclude>
-    <ClInclude Include="MapToolProcess.h">
+    <ClInclude Include="main\MapToolProcess.h">
       <Filter>Main\MapTool</Filter>
     </ClInclude>
-    <ClInclude Include="Example.h">
+    <ClInclude Include="main\Example.h">
       <Filter>Engine</Filter>
     </ClInclude>
-    <ClInclude Include="ResourceManager.h">
+    <ClInclude Include="main\ResourceManager.h">
       <Filter>Main\Manager</Filter>
     </ClInclude>
-    <ClInclude Include="Data.h">
+    <ClInclude Include="main\Data.h">
       <Filter>Main\Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="KeyManager.h">
+    <ClInclude Include="main\KeyManager.h">
       <Filter>Main\Manager</Filter>
     </ClInclude>
   </ItemGroup>
